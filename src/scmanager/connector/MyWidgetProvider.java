@@ -2,7 +2,7 @@ package scmanager.connector;
 
 import java.util.Random;
 
-import my.widget.prototype.R;
+import scmanager.connector.R;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -10,6 +10,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -38,19 +39,11 @@ public class MyWidgetProvider extends AppWidgetProvider {
       RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
           R.layout.widget_layout);
       Log.w("WidgetExample", String.valueOf(number));
-      // Set the text
-      //remoteViews.setTextViewText(R.id.update, String.valueOf(number));
-
-      // Register an onClickListener
-      /*Intent intent = new Intent(context, MyWidgetProvider.class);
-
-      intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-      intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);*/
+      
       Intent active = new Intent(context, MyWidgetProvider.class);
       active.setAction(WIDGET_INTENT);
       
-      PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);/*PendingIntent.getBroadcast(context,
-          0, intent, PendingIntent.FLAG_UPDATE_CURRENT);*/
+      PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
       Intent active2 = new Intent(context, MyWidgetProvider.class);
       active2.setAction(WIDGET_INTENT_MAP);
       PendingIntent pendingIntentMap = PendingIntent.getBroadcast(context, 0, active2, 0);
@@ -65,29 +58,54 @@ public class MyWidgetProvider extends AppWidgetProvider {
     }
   }
 
-@Override
-public void onReceive(Context context, Intent intent) {
-	/*Intent inn = new Intent();
-    inn.setAction(WIDGET_INTENT );
-    Log.i("Intent:", intent.getAction());
-    context.sendBroadcast(inn);*/
-	if (intent.getAction().equals(WIDGET_INTENT)) {
-	    Intent in = new Intent();
-	    in.setAction(WIDGET_INTENT );
-	    Log.i("Intent:", intent.getAction());
-	    context.sendBroadcast(in);
-	} else if (intent.getAction().equals(WIDGET_INTENT_MAP)) {
-		Intent in = new Intent();
-	    in.setAction(WIDGET_INTENT_MAP );
-	    Log.i("Intent:", intent.getAction());
-	    context.sendBroadcast(in);
-	} else if (intent.getAction().equals(WIDGET_INTENT_ADD_CONTACT)) {
-		Intent in = new Intent();
-	    in.setAction(WIDGET_INTENT_ADD_CONTACT );
-	    Log.i("Intent:", intent.getAction());
-	    context.sendBroadcast(in);
+  
+    @Override
+    public void onReceive(Context context, Intent intent) {
+	    if (intent.getAction().equals(WIDGET_INTENT)) {
+	        Intent in = new Intent();
+	        in.setAction(WIDGET_INTENT );
+	        checkIfInstalled(context);
+	        context.sendBroadcast(in);
+	    } else if (intent.getAction().equals(WIDGET_INTENT_MAP)) {
+		    Intent in = new Intent();
+	        in.setAction(WIDGET_INTENT_MAP );
+	        checkIfInstalled(context);
+	        context.sendBroadcast(in);
+	    } else if (intent.getAction().equals(WIDGET_INTENT_ADD_CONTACT)) {
+		    Intent in = new Intent();
+	        in.setAction(WIDGET_INTENT_ADD_CONTACT );
+	        checkIfInstalled(context);
+	        context.sendBroadcast(in);
+	    }
+	    super.onReceive(context, intent);
+    }
+    
+    private void checkIfInstalled(Context context) {
+		boolean installed  =   appInstalledOrNot("manager.ui.screens", context);  
+		if(!installed)
+        {
+        	Intent i = new Intent(context, AlertActivity.class);
+        	i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        	context.startActivity(i);
+        }
+    }
+		private boolean appInstalledOrNot(String uri, Context context)
+	    {
+	        PackageManager pm = context.getPackageManager();
+	        boolean app_installed = false;
+	        try
+	        {
+	               pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+	               app_installed = true;
+	               Log.i("Found!", "Installed");
+	        }
+	        catch (PackageManager.NameNotFoundException e)
+	        {
+	        	Log.i("Not Found!", "Not Installed");
+	               app_installed = false;
+	               
+	        }
+	        return app_installed ;
 	}
-	 super.onReceive(context, intent);
-}
   
 } 

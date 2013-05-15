@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="my.widget.prototype"
+    package="scmanager.connector"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -21,6 +21,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
+        <activity
+            android:name="AlertActivity"
+            android:label="@string/not_installed"
+            android:theme="@android:style/Theme.Dialog"
+            /> 
     </application>
 
 </manifest>
